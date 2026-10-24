@@ -19,37 +19,42 @@ describe("When request body empty", () => {
   });
 });
 
-describe("When request body missing required params", () => {
-  test("raises ZodError with issues", async () => {
-    const req = { body: { email: "          ", password: "          " } }
+const invalidParams = [
+  null,
+  {},
+  { email: "", password: "" },
+  { email: "  ", password: "             " },
+  { email: "invalid@example", password: "123" },
+  { email: "invalid@example.com", password: "123" },
+  { email: "invalid@example", password: "P@ssw0rd123" }
+];
 
-    try {
-      await createHandler(req, {})
-    } catch(err) {
-      expect(err instanceof ZodError).toBeTruthy();
-      const missingPaths = err.issues.map(issue => issue.path.join('.'));
-      expect(missingPaths).toContain('email');
-      expect(missingPaths).toContain('password');
-    }
+const invalidParamsPaths = [
+  [""],
+  ["email", "password"],
+  ["email", "password"],
+  ["email", "password"],
+  ["email", "password"],
+  ["password"],
+  ["email"]
+]
+
+invalidParams.forEach((body, idx) => {
+  describe(`Invalid params ${idx}`, () => {
+    test("raises ZodError with issues", async () => {
+      const req = { body }
+      try {
+        await createHandler(req, {})
+      } catch(err) {
+        expect(err instanceof ZodError).toBeTruthy();
+        const missingPaths = err.issues.map(issue => issue.path.join('.'));
+        invalidParamsPaths[idx].forEach(path => {
+          expect(missingPaths).toContain(path);  
+        })
+      }
+    });
   });
-});
-
-describe("When request body params have incorrect format", () => {
-  test("raises ZodError with issues", async () => {
-    // Email format is wrong
-    // Password too short
-    const req = { body: { email: "test@example", password: "Pass" } }
-
-    try {
-      await createHandler(req, {})
-    } catch(err) {
-      expect(err instanceof ZodError).toBeTruthy();
-      const missingPaths = err.issues.map(issue => issue.path.join('.'));
-      expect(missingPaths).toContain('email');
-      expect(missingPaths).toContain('password');
-    }
-  });
-});
+})
 
 describe("When request required body params are correct", () => {
   test("raises ZodError with issues", async () => {

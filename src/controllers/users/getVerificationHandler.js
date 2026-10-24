@@ -4,8 +4,8 @@ import User from '../../models/User.js';
 import UserVerification from '../../models/UserVerification.js';
 
 const ParamsSchema = z.object({
-  email: z.email()
-});
+  email: z.email("invalid")
+}, "params required");
 
 export default async (req, res) => {
   const { email } = await ParamsSchema.parseAsync(req.body);

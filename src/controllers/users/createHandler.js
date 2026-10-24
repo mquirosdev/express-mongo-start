@@ -13,7 +13,7 @@ const ParamsSchema = z.object({
     return !existingUser
   }, { message: "taken" }),
   password: z.string("required").trim().min(10, { error: "invalid" }),
-}, "invalid_params")
+}, "params required")
 
 export default async (req, res) => {
   let params = await ParamsSchema.parseAsync(req.body);

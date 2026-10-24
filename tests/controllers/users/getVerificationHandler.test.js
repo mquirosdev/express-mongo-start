@@ -19,36 +19,23 @@ describe("When request body is null", () => {
   });
 });
 
-describe("When request body missing required params", () => {
-  test("raises ZodError with issues", async () => {
-    const req = { body: { email: "          " } }
+["", "  ", "invalid@example"].forEach(email => {
+  describe(`When email = "${email}"`, () => {
+    test("raises ZodError with issues", async () => {
+      const req = { body: { email } }
 
-    try {
-      await getVerificationHandler(req, {})
-    } catch(err) {
-      expect(err instanceof ZodError).toBeTruthy();
-      const missingPaths = err.issues.map(issue => issue.path.join('.'));
-      expect(missingPaths).toContain('email');
-    }
+      try {
+        await getVerificationHandler(req, {})
+      } catch(err) {
+        expect(err instanceof ZodError).toBeTruthy();
+        const invalidParams = err.issues.map(issue => issue.path.join('.'));
+        expect(invalidParams).toContain('email');
+      }
+    });
   });
 });
 
-describe("When request body params with incorrect format", () => {
-  test("raises ZodError with issues", async () => {
-    const req = { body: { email: "invalid-email" } }
-
-    try {
-      await getVerificationHandler(req, {})
-    } catch(err) {
-      expect(err instanceof ZodError).toBeTruthy();
-      const missingPaths = err.issues.map(issue => issue.path.join('.'));
-      expect(missingPaths).toContain('email');
-    }
-  });
-});
-
-
-describe("when request body correct", () => {
+describe("when request body valid", () => {
   let res;
   const email = "valid@example.com";
   const req = { body: { email: email } };
@@ -57,7 +44,7 @@ describe("when request body correct", () => {
     res = { status: vi.fn().mockReturnThis(), send: vi.fn().mockReturnThis() };
   });
 
-  describe("User does not exist", () => {
+  describe("User does not exist for email", () => {
     test("Throws DocumentNotFoundError", async () => {
       const user = new User({ email, status: "active", password: "P@ssw0rd123" });
       await user.save();
@@ -71,19 +58,30 @@ describe("when request body correct", () => {
   });
 
   describe("User exist and first verification", () => {
-    test("Creates verification", async () => {
-      const user = new User({ email, password: "P@ssw0rd123" });
-      await user.save();
+    let user;
+    let verification;
 
+    const getVerification = async () => {
+      user = new User({ email, password: "P@ssw0rd123" });
+      await user.save();
       await getVerificationHandler(req, res);
-      
-      const verification = await UserVerification.findOne({ email }).orFail();
-      expect(verification.code).toHaveLength(6);
-      expect(verification.uuid.length()).toBe(16);
-      expect(verification.expiresAt.valueOf()).toBeGreaterThan(new Date().valueOf());
+      verification = await UserVerification.findOne({ 
+        email,
+        expiresAt: { "$gt": new Date() }
+      }).orFail();
+    };
+
+    test("Set status to 204", async () => {
+      await getVerification();
 
       expect(res.status).toHaveBeenCalledExactlyOnceWith(204);
       expect(res.send).toHaveBeenCalledExactlyOnceWith();
+    });
+
+    test("Creates verification", async () => {
+      await getVerification();
+      expect(verification.code).toHaveLength(6);
+      expect(verification.uuid.length()).toBe(16);
     });
   });
 
@@ -98,10 +96,13 @@ describe("when request body correct", () => {
 
       await getVerificationHandler(req, res);
       
-      verification = await UserVerification.findOne({ email }).orFail();
+      verification = await UserVerification.findOne({ 
+        email,
+        expiresAt: { "$gt": new Date() }
+      }).orFail();
+      
       expect(verification.code).toHaveLength(6);
       expect(verification.uuid.length()).toBe(16);
-      expect(verification.expiresAt.valueOf()).toBeGreaterThan(new Date().valueOf());
 
       expect(res.status).toHaveBeenCalledExactlyOnceWith(204);
       expect(res.send).toHaveBeenCalledExactlyOnceWith();
