@@ -1,10 +1,13 @@
-import { describe, test, expect, vi } from "vitest";
+import { describe, test, expect, vi, beforeAll, beforeEach } from "vitest";
 import { ZodError } from "zod";
 
 import createHandler from "../../../src/controllers/users/createHandler.js";
 import UserPresenter from "../../../src/presenters/UserPresenter.js";
 import User from "../../../src/models/User.js";
 
+vi.mock("../../../src/services/digestPasswordString.js", () => ({
+  default: vi.fn(() => ["digest", "salt"])
+}));
 
 describe("When request body empty", () => {
   test("raises ZodError with issues", async () => {
@@ -57,16 +60,26 @@ invalidParams.forEach((body, idx) => {
 })
 
 describe("When request required body params are correct", () => {
-  test("raises ZodError with issues", async () => {
-    const email = "test@example.com";
-    const req = { body: { email, password: "P@ssw0rd-test"} };
-    const res = { status: vi.fn().mockReturnThis(), json: vi.fn().mockReturnThis() };
+  const email = "test@example.com";
+  const password = "P@ssw0rd123";
+  const req = { body: { email, password } };
+  const res = { status: vi.fn().mockReturnThis(), json: vi.fn().mockReturnThis() };
+
+  beforeEach(() => vi.clearAllMocks());
+
+  test("create user", async () => {
     await createHandler(req, res);
-    
-    const users = await User.find({ email });
-    expect(users).toHaveLength(1);
-    
+    const user = await User.findOne({ email }).orFail();
+    expect(user.email).toEqual(email);
+    expect(user.status).toEqual("new");
+    expect(user.passwordDigest).toEqual("digest");
+    expect(user.salt).toEqual("salt");
+  });
+
+  test("return status 201", async () => {
+    await createHandler(req, res);
+    const user = await User.findOne({ email }).orFail();
     expect(res.status).toHaveBeenCalledExactlyOnceWith(201);
-    expect(res.json).toHaveBeenCalledExactlyOnceWith(new UserPresenter(users[0]).values)
+    expect(res.json).toHaveBeenCalledExactlyOnceWith(new UserPresenter(user).values)
   });
 });
