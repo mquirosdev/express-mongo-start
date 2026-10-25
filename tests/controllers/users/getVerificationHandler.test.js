@@ -1,10 +1,15 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { ZodError } from "zod";
+import { uuid, ZodError } from "zod";
 import { Error } from "mongoose";
 
 import User from "../../../src/models/User.js";
 import UserVerification from "../../../src/models/UserVerification.js";
 import getVerificationHandler from "../../../src/controllers/users/getVerificationHandler.js";
+import sendVerification from "../../../src/mailers/user/sendVerification.js";
+
+vi.mock("../../../src/mailers/user/sendVerification.js", () => ({
+  default: vi.fn()
+}));
 
 describe("When request body is null", () => {
   test("raises ZodError with issues", async () => {
@@ -33,6 +38,10 @@ describe("When request body is null", () => {
       }
     });
   });
+});
+
+beforeEach(() => {
+  vi.clearAllMocks();
 });
 
 describe("when request body valid", () => {
@@ -83,29 +92,57 @@ describe("when request body valid", () => {
       expect(verification.code).toHaveLength(6);
       expect(verification.uuid.length()).toBe(16);
     });
+
+    test("Mails verification", async () => {
+      await getVerification();
+      expect(sendVerification).toHaveBeenCalledExactlyOnceWith({
+        email: verification.email,
+        code: verification.code,
+        uuid: verification.uuid
+      });
+    });
   });
 
   describe("User exist and second verification", () => {
-    test("Creates verification", async () => {
-      const user = new User({ email, password: "P@ssw0rd123" });
+    let user;
+    let verification;
+
+    const getVerification = async () => {
+      user = new User({ email, password: "P@ssw0rd123" });
       await user.save();
 
-      let verification = new UserVerification({ email })
+      verification = new UserVerification({ email })
       verification.generateCode();
       await verification.save();
 
       await getVerificationHandler(req, res);
-      
+
       verification = await UserVerification.findOne({ 
         email,
         expiresAt: { "$gt": new Date() }
       }).orFail();
-      
-      expect(verification.code).toHaveLength(6);
-      expect(verification.uuid.length()).toBe(16);
+    };
+
+    test("Set status to 204", async () => {
+      await getVerification();
 
       expect(res.status).toHaveBeenCalledExactlyOnceWith(204);
       expect(res.send).toHaveBeenCalledExactlyOnceWith();
+    });
+
+    test("Creates verification", async () => {
+      await getVerification();
+      expect(verification.code).toHaveLength(6);
+      expect(verification.uuid.length()).toBe(16);
+    });
+
+    test("Mails verification", async () => {
+      await getVerification();
+      expect(sendVerification).toHaveBeenCalledExactlyOnceWith({
+        email: verification.email,
+        code: verification.code,
+        uuid: verification.uuid
+      });
     });
   });
 });

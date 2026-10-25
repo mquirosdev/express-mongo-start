@@ -1,7 +1,8 @@
-import { z } from "zod";
+import { uuid, z } from "zod";
 
 import User from '../../models/User.js';
 import UserVerification from '../../models/UserVerification.js';
+import sendVerification from "../../mailers/user/sendVerification.js";
 
 const ParamsSchema = z.object({
   email: z.email("invalid")
@@ -16,6 +17,8 @@ export default async (req, res) => {
   
   verification.generateCode();
   await verification.save();
+
+  await sendVerification({ email: verification.email, code: verification.code, uuid: verification.uuid });
 
   res.status(204).send();
 }
