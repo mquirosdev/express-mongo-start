@@ -6,6 +6,12 @@ import User from "../../../src/models/User.js";
 import UserVerification from "../../../src/models/UserVerification.js";
 import verifyHandler from "../../../src/controllers/users/verifyHandler.js";
 
+vi.mock("../../../src/models/useTransaction.js", () => ({
+  default: vi.fn(() => (async function(fn) {
+    await fn();
+  }))
+}));
+
 describe("verifyHandler", () => {
   let res;
 

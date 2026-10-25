@@ -60,4 +60,4 @@ switch(process.env.NODE_ENV) {
     sender = productionSender;
 }
 
-export default sender;
+export default () => sender;

@@ -2,7 +2,7 @@ import { smtpSender } from "../../constants.js"
 import useSend from "../useSend.js";
 
 export default async (verification) => {
-  const send = await useSend;
+  const send = await useSend();
   send({
     from: smtpSender,
     to: verification.email,
