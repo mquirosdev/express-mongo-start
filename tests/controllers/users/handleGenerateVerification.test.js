@@ -4,7 +4,7 @@ import { Error } from "mongoose";
 
 import User from "../../../src/models/User.js";
 import UserVerification from "../../../src/models/UserVerification.js";
-import getVerificationHandler from "../../../src/controllers/users/getVerificationHandler.js";
+import handleGenerateVerification from "../../../src/controllers/users/handleGenerateVerification.js";
 import sendVerification from "../../../src/mailers/user/sendVerification.js";
 
 vi.mock("../../../src/mailers/user/sendVerification.js", () => ({
@@ -15,7 +15,7 @@ describe("When request body is null", () => {
   test("raises ZodError with issues", async () => {
     const req = { body: null }
     try {
-      await getVerificationHandler(req, {})
+      await handleGenerateVerification(req, {})
     } catch(err) {
       expect(err instanceof ZodError).toBeTruthy();
       expect(err.issues).toHaveLength(1);
@@ -30,7 +30,7 @@ describe("When request body is null", () => {
       const req = { body: { email } }
 
       try {
-        await getVerificationHandler(req, {})
+        await handleGenerateVerification(req, {})
       } catch(err) {
         expect(err instanceof ZodError).toBeTruthy();
         const invalidParams = err.issues.map(issue => issue.path.join('.'));
@@ -59,7 +59,7 @@ describe("when request body valid", () => {
       await user.save();
 
       try {
-        await getVerificationHandler(req, res);
+        await handleGenerateVerification(req, res);
       } catch(err) {
         expect(err instanceof Error.DocumentNotFoundError).toBeTruthy();
       }
@@ -73,7 +73,7 @@ describe("when request body valid", () => {
     const getVerification = async () => {
       user = new User({ email, password: "P@ssw0rd123" });
       await user.save();
-      await getVerificationHandler(req, res);
+      await handleGenerateVerification(req, res);
       verification = await UserVerification.findOne({ 
         email,
         expiresAt: { "$gt": new Date() }
@@ -115,7 +115,7 @@ describe("when request body valid", () => {
       verification.generateCode();
       await verification.save();
 
-      await getVerificationHandler(req, res);
+      await handleGenerateVerification(req, res);
 
       verification = await UserVerification.findOne({ 
         email,

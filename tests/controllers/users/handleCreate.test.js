@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, beforeAll, beforeEach } from "vitest";
 import { ZodError } from "zod";
 
-import createHandler from "../../../src/controllers/users/createHandler.js";
+import handleCreate from "../../../src/controllers/users/handleCreate.js";
 import UserPresenter from "../../../src/presenters/UserPresenter.js";
 import User from "../../../src/models/User.js";
 
@@ -13,7 +13,7 @@ describe("When request body empty", () => {
   test("raises ZodError with issues", async () => {
     const req = { body: null }
     try {
-      await createHandler(req, {})
+      await handleCreate(req, {})
     } catch(err) {
       expect(err instanceof ZodError).toBeTruthy();
       expect(err.issues).toHaveLength(1);
@@ -47,7 +47,7 @@ invalidParams.forEach((body, idx) => {
     test("raises ZodError with issues", async () => {
       const req = { body }
       try {
-        await createHandler(req, {})
+        await handleCreate(req, {})
       } catch(err) {
         expect(err instanceof ZodError).toBeTruthy();
         const missingPaths = err.issues.map(issue => issue.path.join('.'));
@@ -68,7 +68,7 @@ describe("When request required body params are correct", () => {
   beforeEach(() => vi.clearAllMocks());
 
   test("create user", async () => {
-    await createHandler(req, res);
+    await handleCreate(req, res);
     const user = await User.findOne({ email }).orFail();
     expect(user.email).toEqual(email);
     expect(user.status).toEqual("new");
@@ -77,7 +77,7 @@ describe("When request required body params are correct", () => {
   });
 
   test("return status 201", async () => {
-    await createHandler(req, res);
+    await handleCreate(req, res);
     const user = await User.findOne({ email }).orFail();
     expect(res.status).toHaveBeenCalledExactlyOnceWith(201);
     expect(res.json).toHaveBeenCalledExactlyOnceWith(new UserPresenter(user).values)

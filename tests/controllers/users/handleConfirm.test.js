@@ -4,7 +4,7 @@ import { ZodError } from "zod";
 
 import User from "../../../src/models/User.js";
 import UserVerification from "../../../src/models/UserVerification.js";
-import verifyHandler from "../../../src/controllers/users/verifyHandler.js";
+import handleConfirm from "../../../src/controllers/users/handleConfirm.js";
 
 vi.mock("../../../src/models/useTransaction.js", () => ({
   default: vi.fn(() => (async function(fn) {
@@ -12,7 +12,7 @@ vi.mock("../../../src/models/useTransaction.js", () => ({
   }))
 }));
 
-describe("verifyHandler", () => {
+describe("handleConfirm", () => {
   let res;
 
   beforeEach(() => {
@@ -20,7 +20,7 @@ describe("verifyHandler", () => {
   });
 
   test("rejects a null request body", async () => {
-    await expect(verifyHandler({ body: null }, res)).rejects.toBeInstanceOf(
+    await expect(handleConfirm({ body: null }, res)).rejects.toBeInstanceOf(
       ZodError,
     );
   });
@@ -31,7 +31,7 @@ describe("verifyHandler", () => {
     ["both", "   ", "   "],
   ])("rejects blank %s values", async (_label, uuid, code) => {
     await expect(
-      verifyHandler({ body: { uuid, code } }, res),
+      handleConfirm({ body: { uuid, code } }, res),
     ).rejects.toBeInstanceOf(ZodError);
   });
 
@@ -42,7 +42,7 @@ describe("verifyHandler", () => {
     await verification.save();
 
     await expect(
-      verifyHandler(
+      handleConfirm(
         { body: { uuid: verification.uuid.toString(), code: verification.code } },
         res,
       ),
@@ -58,7 +58,7 @@ describe("verifyHandler", () => {
     verification.generateCode();
     await verification.save();
 
-    await verifyHandler(
+    await handleConfirm(
       { body: { uuid: verification.uuid.toString(), code: verification.code } },
       res,
     );

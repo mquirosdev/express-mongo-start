@@ -1,25 +1,25 @@
 import express from "express";
 
 import bodyParserMiddleware from '../middleware/bodyParserMiddleware.js';
-import createHandler from '../controllers/users/createHandler.js';
-import verifyHandler from "../controllers/users/verifyHandler.js";
-import getVerificationHandler from '../controllers/users/getVerificationHandler.js'
+import handleCreate from '../controllers/users/handleCreate.js';
+import handleConfirm from "../controllers/users/handleConfirm.js";
+import handleGenerateVerification from '../controllers/users/handleGenerateVerification.js'
 
 const userRouter = express.Router();
 
 userRouter.post("/", 
   bodyParserMiddleware.none(),
-  createHandler
+  handleCreate
 )
 
 userRouter.put("/verification/confirm",
   bodyParserMiddleware.none(),
-  verifyHandler
+  handleConfirm
 )
 
 userRouter.post("/verification",
   bodyParserMiddleware.none(),
-  getVerificationHandler
+  handleGenerateVerification
 )
 
 export default userRouter;
