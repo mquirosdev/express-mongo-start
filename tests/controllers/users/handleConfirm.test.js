@@ -68,7 +68,7 @@ describe("handleConfirm", () => {
 
     expect(updatedVerification.expiresAt.valueOf()).toBeLessThan(Date.now());
     expect(updatedUser.status).toBe("active");
-    expect(res.status).toHaveBeenCalledExactlyOnceWith(200);
+    expect(res.status).toHaveBeenCalledExactlyOnceWith(204);
     expect(res.send).toHaveBeenCalledExactlyOnceWith();
   });
 });

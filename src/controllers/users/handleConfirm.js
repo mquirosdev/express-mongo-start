@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { addMinutes } from "date-fns";
 
 import useTransaction from "../../models/useTransaction.js";
 import UserVerification from "../../models/UserVerification.js";
@@ -6,9 +7,9 @@ import User from "../../models/User.js";
 
 
 const ParamsSchema = z.object({
-  uuid: z.string().trim().min(1),
-  code: z.string().trim().min(1)
-});
+  uuid: z.string("required").trim().min(1, "invalid"),
+  code: z.string("required").trim().min(6, "invalid")
+}, "params required");
 
 export default async (req, res) => {
   const { uuid, code } = await ParamsSchema.parseAsync(req.body);
@@ -20,7 +21,7 @@ export default async (req, res) => {
       expiresAt: { "$gt": new Date() }
     }).orFail();
 
-    verification.expiresAt = (new Date().valueOf() - 1000);
+    verification.expiresAt = addMinutes(new Date(), - 10);
     await verification.save();
 
     const user =  await User.findOne({ email: verification.email, status: "new" }).orFail();
@@ -28,5 +29,5 @@ export default async (req, res) => {
     await user.save();
   });
   
-  res.status(200).send();
+  res.status(204).send();
 }
