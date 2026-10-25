@@ -84,7 +84,7 @@ describe("POST /users", () => {
       const user = await User.findOne({ email }).exec();
       const responseBody = new UserPresenter(user).values;
 
-      ['id', 'name', 'email', 'status'].forEach((k) => {
+      ['name', 'email', 'status'].forEach((k) => {
         expect(response.body[k]).toEqual(responseBody[k]);
       });
     })

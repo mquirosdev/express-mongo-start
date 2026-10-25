@@ -30,9 +30,7 @@ const UserVerificationSchema = Schema(
     timestamps: true,
     methods: {
       generateCode: function() {
-        let code = [];
-        for(let i = 1; i <= VerificationCodeLength; i++) { code.push(Math.floor(Math.random() * 10)); }
-        this.code = code.join('');
+        this.code = String(crypto.randomInt(0, 1000000)).padStart(6, '0');
         this.expiresAt = addMinutes(new Date(), VerificationCodeMinutesTTL);
         this.uuid = crypto.randomUUID();
       }
@@ -40,4 +38,4 @@ const UserVerificationSchema = Schema(
   }
 );
 
-export default model('userVerifications', UserVerificationSchema);
+export default model('user_verifications', UserVerificationSchema);

@@ -70,9 +70,7 @@ describe("POST /users/verification", () => {
 
       test("verification created", async() => {
         await getVerification();
-        expect(async () => {
-          await UserVerification.findOne({ email, expiresAt: { "$gt": new Date() } }).orFail();
-        })
+        await UserVerification.findOne({ email, expiresAt: { "$gt": new Date() } }).orFail();
       })
     });
   });
