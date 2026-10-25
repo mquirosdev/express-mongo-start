@@ -2,7 +2,7 @@ import { describe, test, expect, vi, beforeAll, beforeEach } from "vitest";
 import { ZodError } from "zod";
 
 import handleCreate from "../../../src/controllers/users/handleCreate.js";
-import UserPresenter from "../../../src/presenters/UserPresenter.js";
+import presentUser from "../../../src/presenters/presentUser.js";
 import User from "../../../src/models/User.js";
 
 vi.mock("../../../src/services/digestPasswordString.js", () => ({
@@ -80,6 +80,6 @@ describe("When request required body params are correct", () => {
     await handleCreate(req, res);
     const user = await User.findOne({ email }).orFail();
     expect(res.status).toHaveBeenCalledExactlyOnceWith(201);
-    expect(res.json).toHaveBeenCalledExactlyOnceWith(new UserPresenter(user).values)
+    expect(res.json).toHaveBeenCalledExactlyOnceWith(presentUser(user))
   });
 });

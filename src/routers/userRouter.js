@@ -1,6 +1,6 @@
 import express from "express";
 
-import bodyParserMiddleware from '../middleware/bodyParserMiddleware.js';
+import parseMultipartBody from '../middleware/parseMultipartBody.js';
 import handleCreate from '../controllers/users/handleCreate.js';
 import handleConfirm from "../controllers/users/handleConfirm.js";
 import handleGenerateVerification from '../controllers/users/handleGenerateVerification.js'
@@ -8,17 +8,17 @@ import handleGenerateVerification from '../controllers/users/handleGenerateVerif
 const userRouter = express.Router();
 
 userRouter.post("/", 
-  bodyParserMiddleware.none(),
+  parseMultipartBody.none(),
   handleCreate
 )
 
 userRouter.put("/verification/confirm",
-  bodyParserMiddleware.none(),
+  parseMultipartBody.none(),
   handleConfirm
 )
 
 userRouter.post("/verification",
-  bodyParserMiddleware.none(),
+  parseMultipartBody.none(),
   handleGenerateVerification
 )
 

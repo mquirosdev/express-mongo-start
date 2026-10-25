@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import User from '../../models/User.js';
-import UserPresenter from "../../presenters/UserPresenter.js";
+import presentUser from "../../presenters/presentUser.js";
 
 const ParamsSchema = z.object({
   name: z.object({
@@ -22,5 +22,5 @@ export default async (req, res) => {
   const user = new User(params);
   await user.save();
 
-  res.status(201).json(new UserPresenter(user).values);
+  res.status(201).json(presentUser(user));
 }

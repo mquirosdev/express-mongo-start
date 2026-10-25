@@ -3,7 +3,7 @@ import request from 'supertest';
 
 import app from "../../../src/app.js";
 import User from '../../../src/models/User.js';
-import UserPresenter from '../../../src/presenters/UserPresenter.js';
+import presentUser from '../../../src/presenters/presentUser.js';
 
 class InvalidRequestBody {
   constructor(email, password) {
@@ -82,7 +82,7 @@ describe("POST /users", () => {
       expect(response.status).toBe(201);
       
       const user = await User.findOne({ email }).exec();
-      const responseBody = new UserPresenter(user).values;
+      const responseBody = presentUser(user);
 
       ['name', 'email', 'status'].forEach((k) => {
         expect(response.body[k]).toEqual(responseBody[k]);
