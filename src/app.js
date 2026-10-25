@@ -29,7 +29,8 @@ app.use((err, _req, res, next) => {
     res.status(404).json({ messages: ["Record not found"] });
   } else {
     const status = err.status || 500;
-    res.status(status).json({ messages: [err.message] });
+    const error = ['development', 'test'].includes(process.env.NODE_ENV) ? err.message : "Something went wrong";
+    res.status(status).json({ messages: [error] });
   }
 });
 
