@@ -14,13 +14,12 @@ vi.mock("../../../src/mailers/user/sendVerification.js", () => ({
 describe("When request body is null", () => {
   test("raises ZodError with issues", async () => {
     const req = { body: null }
-    try {
-      await handleGenerateVerification(req, {})
-    } catch(err) {
-      expect(err instanceof ZodError).toBeTruthy();
-      expect(err.issues).toHaveLength(1);
-      expect(err.issues[0]['expected']).toEqual('object');
-    }
+    let err;
+    try { await handleGenerateVerification(req, {}) } 
+    catch(e) { err = e}
+    expect(err instanceof ZodError).toBeTruthy();
+    expect(err.issues).toHaveLength(1);
+    expect(err.issues[0]['expected']).toEqual('object');
   });
 });
 
@@ -28,20 +27,14 @@ describe("When request body is null", () => {
   describe(`When email = "${email}"`, () => {
     test("raises ZodError with issues", async () => {
       const req = { body: { email } }
-
-      try {
-        await handleGenerateVerification(req, {})
-      } catch(err) {
-        expect(err instanceof ZodError).toBeTruthy();
-        const invalidParams = err.issues.map(issue => issue.path.join('.'));
-        expect(invalidParams).toContain('email');
-      }
+      let err;
+      try { await handleGenerateVerification(req, {}) } 
+      catch(e) { err = e }
+      expect(err instanceof ZodError).toBeTruthy();
+      const invalidParams = err.issues.map(issue => issue.path.join('.'));
+      expect(invalidParams).toContain('email');
     });
   });
-});
-
-beforeEach(() => {
-  vi.clearAllMocks();
 });
 
 describe("when request body valid", () => {
@@ -57,12 +50,10 @@ describe("when request body valid", () => {
     test("Throws DocumentNotFoundError", async () => {
       const user = new User({ email, status: "active", password: "P@ssw0rd123" });
       await user.save();
-
-      try {
-        await handleGenerateVerification(req, res);
-      } catch(err) {
-        expect(err instanceof Error.DocumentNotFoundError).toBeTruthy();
-      }
+      let err;
+      try { await handleGenerateVerification(req, res) } 
+      catch(e) { err = e}
+      expect(err instanceof Error.DocumentNotFoundError).toBeTruthy();
     });
   });
 

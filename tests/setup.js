@@ -1,8 +1,12 @@
 import mongoose from 'mongoose';
 
-import { beforeAll, afterAll, aroundEach } from 'vitest';
+import { beforeAll, afterAll, aroundEach, beforeEach, vi } from 'vitest';
 
 mongoose.set('transactionAsyncLocalStorage', true);
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
 
 beforeAll(async () => {
   await mongoose.connect(`${process.env.MONGODB_URI}/${process.env.MONGODB_DATABASE}`)

@@ -12,13 +12,13 @@ vi.mock("../../../src/services/digestPasswordString.js", () => ({
 describe("When request body empty", () => {
   test("raises ZodError with issues", async () => {
     const req = { body: null }
-    try {
-      await handleCreate(req, {})
-    } catch(err) {
-      expect(err instanceof ZodError).toBeTruthy();
-      expect(err.issues).toHaveLength(1);
-      expect(err.issues[0]['expected']).toEqual('object');
-    }
+    let err;
+    try { await handleCreate(req, {}) } 
+    catch(e) { err = e }
+
+    expect(err instanceof ZodError).toBeTruthy();
+    expect(err.issues).toHaveLength(1);
+    expect(err.issues[0]['expected']).toEqual('object');
   });
 });
 
@@ -46,15 +46,14 @@ invalidParams.forEach((body, idx) => {
   describe(`Invalid params ${idx}`, () => {
     test("raises ZodError with issues", async () => {
       const req = { body }
-      try {
-        await handleCreate(req, {})
-      } catch(err) {
-        expect(err instanceof ZodError).toBeTruthy();
-        const missingPaths = err.issues.map(issue => issue.path.join('.'));
-        invalidParamsPaths[idx].forEach(path => {
-          expect(missingPaths).toContain(path);  
-        })
-      }
+      let err;
+      try { await handleCreate(req, {}) } catch(e) { err = e }
+
+      expect(err instanceof ZodError).toBeTruthy();
+      const missingPaths = err.issues.map(issue => issue.path.join('.'));
+      invalidParamsPaths[idx].forEach(path => {
+        expect(missingPaths).toContain(path);  
+      })
     });
   });
 })
