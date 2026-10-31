@@ -2,14 +2,17 @@ import express from "express";
 import mongoose from "mongoose";
 import { MulterError } from "multer";
 import { ZodError } from "zod";
+import jwt from "jsonwebtoken";
 
 import userRouter from "./routers/userRouter.js";
+import appRouter from "./routers/appRouter.js";
 
 const app = express();
 
 app.use(express.json());
   
-app.use('/users', userRouter)
+app.use('/users', userRouter);
+app.use('/app', appRouter);
 
 // This catches errors when validating if attached files are valid
 app.use((err, _req, res, next) => {
@@ -27,6 +30,8 @@ app.use((err, _req, res, next) => {
     });
   } else if(err instanceof mongoose.Error.DocumentNotFoundError) {
     res.status(404).json({ messages: ["Record not found"] });
+  } else if(err instanceof jwt.JsonWebTokenError || err instanceof jwt.TokenExpiredError) {
+    res.status(401).json({ messages: ["invalid token"] });
   } else {
     const status = err.status || 500;
     const error = ['development', 'test'].includes(process.env.NODE_ENV) ? err.message : "Something went wrong";

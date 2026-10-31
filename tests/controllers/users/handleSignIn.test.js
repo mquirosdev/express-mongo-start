@@ -84,7 +84,7 @@ describe("handleSignIn", () => {
     });
 
     describe("when email corresponds to active user and correct password", () => {
-      test("return status 422", async () => {
+      test("return status 200", async () => {
         await createUser(email, password, "active");
         await handleSignIn({ body }, res);
         expect(res.status).toHaveBeenCalledExactlyOnceWith(200);
