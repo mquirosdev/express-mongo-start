@@ -1,12 +1,12 @@
-import express from "express";
+import express from 'express'
 
-import jwtAuthentication from "../middleware/jwtAuthentication.js";
+import jwtAuthentication from '../middleware/jwtAuthentication.js'
 
-const appRouter = express.Router();
-appRouter.use(jwtAuthentication);
+const appRouter = express.Router()
+appRouter.use(jwtAuthentication)
 
-appRouter.get("/", (req, res) => {
-  res.status(200).json({ message: "Home" });
-});
+appRouter.get('/', (req, res) => {
+  res.status(200).json({ message: 'Home' })
+})
 
-export default appRouter;
+export default appRouter

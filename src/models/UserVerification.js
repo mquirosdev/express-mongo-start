@@ -1,8 +1,8 @@
-import crypto from "node:crypto";
-import { addMinutes } from "date-fns";
-import { Schema, model } from "mongoose";
+import crypto from 'node:crypto'
+import { addMinutes } from 'date-fns'
+import { Schema, model } from 'mongoose'
 
-const VerificationCodeMinutesTTL = 5;
+const VerificationCodeMinutesTTL = 5
 const UserVerificationSchema = Schema(
   {
     uuid: {
@@ -28,13 +28,13 @@ const UserVerificationSchema = Schema(
   {
     timestamps: true,
     methods: {
-      generateCode: function() {
-        this.code = String(crypto.randomInt(0, 1000000)).padStart(6, '0');
-        this.expiresAt = addMinutes(new Date(), VerificationCodeMinutesTTL);
-        this.uuid = crypto.randomUUID();
+      generateCode: function () {
+        this.code = String(crypto.randomInt(0, 1000000)).padStart(6, '0')
+        this.expiresAt = addMinutes(new Date(), VerificationCodeMinutesTTL)
+        this.uuid = crypto.randomUUID()
       }
     }
   }
-);
+)
 
-export default model('user_verifications', UserVerificationSchema);
+export default model('user_verifications', UserVerificationSchema)

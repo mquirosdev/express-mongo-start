@@ -1,91 +1,98 @@
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { describe, test, expect, beforeEach, afterEach } from 'vitest';
-import request from 'supertest';
-import mongoose from "mongoose";
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import { describe, test, expect, beforeEach, afterEach } from 'vitest'
+import request from 'supertest'
+import mongoose from 'mongoose'
 
-import app from "../../../src/app.js";
-import User from '../../../src/models/User.js';
-import UserVerification from '../../../src/models/UserVerification.js';
+import app from '../../../src/app.js'
+import User from '../../../src/models/User.js'
+import UserVerification from '../../../src/models/UserVerification.js'
 
-let mongoServer;
+let mongoServer
 
 beforeEach(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  await mongoose.connect(mongoServer.getUri());
-});
+  mongoServer = await MongoMemoryServer.create()
+  await mongoose.connect(mongoServer.getUri())
+})
 
 afterEach(async () => {
-  await mongoose.disconnect();
-  await mongoServer.stop();
-});
+  await mongoose.disconnect()
+  await mongoServer.stop()
+})
 
-describe("POST /api/v1/users/verification", () => {
-  describe("without parameters", () => {
-    test("reponse status 422", async () => {
+describe('POST /api/v1/users/verification', () => {
+  describe('without parameters', () => {
+    test('reponse status 422', async () => {
       const response = await request(app)
         .post('/api/v1/users/verification')
         .set('Accept', 'application/json')
 
-      expect(response.status).toBe(422);
-      expect(response.body.messages).toEqual([' params required']);
-    });
-  });
+      expect(response.status).toBe(422)
+      expect(response.body.messages).toEqual([' params required'])
+    })
+  })
 
-  ["", "     ", "invalid@example"].forEach(email => {
+  ;['', '     ', 'invalid@example'].forEach((email) => {
     describe(`with email = "${email}"`, () => {
-      test("reponse status 422", async () => {
+      test('reponse status 422', async () => {
         const response = await request(app)
           .post('/api/v1/users/verification')
           .set('Accept', 'application/json')
           .send({ email })
 
-        expect(response.status).toBe(422);
-        expect(response.body.messages).toEqual(['email invalid']);
-      });
-    });
-  });
+        expect(response.status).toBe(422)
+        expect(response.body.messages).toEqual(['email invalid'])
+      })
+    })
+  })
 
-  describe("with valid email", () => {
-    const email = "valid@example.com";
+  describe('with valid email', () => {
+    const email = 'valid@example.com'
 
-    describe("New User does not exist for such email", () => {      
-      test("response status 404", async () => {
-        const user = new User({ email, status: "active", password: "P@ssw0rd123" });
-        await user.save();
+    describe('New User does not exist for such email', () => {
+      test('response status 404', async () => {
+        const user = new User({
+          email,
+          status: 'active',
+          password: 'P@ssw0rd123'
+        })
+        await user.save()
 
         const response = await request(app)
           .post('/api/v1/users/verification')
           .set('Accept', 'application/json')
-          .send({ email  })
+          .send({ email })
 
-        expect(response.status).toBe(404);
-        expect(response.body.messages).toEqual(['Record not found']);
-      });
-    });
+        expect(response.status).toBe(404)
+        expect(response.body.messages).toEqual(['Record not found'])
+      })
+    })
 
-    describe("New user exist for such email", () => {
-      let user;
-      let response;
+    describe('New user exist for such email', () => {
+      let user
+      let response
 
       const getVerification = async () => {
-        user = new User({ email, password: "P@ssw0rd123" });
-        await user.save();
+        user = new User({ email, password: 'P@ssw0rd123' })
+        await user.save()
 
         response = await request(app)
           .post('/api/v1/users/verification')
           .set('Accept', 'application/json')
-          .send({ email  })
+          .send({ email })
       }
-      
-      test("response status 204", async () => {
-        await getVerification();
-        expect(response.status).toBe(204);
-      });
 
-      test("verification created", async() => {
-        await getVerification();
-        await UserVerification.findOne({ email, expiresAt: { "$gt": new Date() } }).orFail();
+      test('response status 204', async () => {
+        await getVerification()
+        expect(response.status).toBe(204)
       })
-    });
-  });
-});
+
+      test('verification created', async () => {
+        await getVerification()
+        await UserVerification.findOne({
+          email,
+          expiresAt: { $gt: new Date() }
+        }).orFail()
+      })
+    })
+  })
+})

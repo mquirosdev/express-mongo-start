@@ -1,114 +1,114 @@
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
-import request from 'supertest';
-import mongoose from "mongoose";
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
+import request from 'supertest'
+import mongoose from 'mongoose'
 
-import app from "../../../src/app.js";
-import User from '../../../src/models/User.js';
+import app from '../../../src/app.js'
+import User from '../../../src/models/User.js'
 
-let mongoServer;
+let mongoServer
 
 beforeEach(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  await mongoose.connect(mongoServer.getUri());
-});
+  mongoServer = await MongoMemoryServer.create()
+  await mongoose.connect(mongoServer.getUri())
+})
 
 afterEach(async () => {
-  await mongoose.disconnect();
-  await mongoServer.stop();
-});
+  await mongoose.disconnect()
+  await mongoServer.stop()
+})
 
-vi.mock("../../../src/services/jwtSession", () => ({
-  createToken: vi.fn().mockReturnValue("test.test.test")
-}));
+vi.mock('../../../src/services/jwtSession', () => ({
+  createToken: vi.fn().mockReturnValue('test.test.test')
+}))
 
-describe("POST /api/v1/users/signin", () => {
+describe('POST /api/v1/users/signin', () => {
   const invalidRequestMessages = [
-    [" params required"],
-    ["email invalid", "password required"],
-    ["email invalid", "password invalid"],
-    ["email invalid"]
-  ];
+    [' params required'],
+    ['email invalid', 'password required'],
+    ['email invalid', 'password invalid'],
+    ['email invalid']
+  ]
 
-  [
+  ;[
     null,
     {},
-    { email: "  ", password: "  " },
-    { email: "invalid@example", password: "P@ssw0rd" }
+    { email: '  ', password: '  ' },
+    { email: 'invalid@example', password: 'P@ssw0rd' }
   ].forEach((body, idx) => {
     describe(`When invalid params ${idx}`, async () => {
-      test("returns 422 status", async () => {
+      test('returns 422 status', async () => {
         const response = await request(app)
-        .post('/api/v1/users/signin')
-        .set('Accept', 'application/json')
-        .send(body)
+          .post('/api/v1/users/signin')
+          .set('Accept', 'application/json')
+          .send(body)
 
-        expect(response.status).toBe(422);
-        invalidRequestMessages[idx].forEach(msg => {
-          expect(response.body.messages).toContain(msg);
-        });
-      });
-    });
-  });
+        expect(response.status).toBe(422)
+        invalidRequestMessages[idx].forEach((msg) => {
+          expect(response.body.messages).toContain(msg)
+        })
+      })
+    })
+  })
 
-  describe("when valid params", () => {
-    const email = "valid@example.com";
-    const password = "P@ssw0rd";
+  describe('when valid params', () => {
+    const email = 'valid@example.com'
+    const password = 'P@ssw0rd'
 
     const createUser = async (email, password, status) => {
-      const user = new User({ email, password, status });
-      await user.save();
+      const user = new User({ email, password, status })
+      await user.save()
     }
 
-    describe("when user not found by email", () => {
-      test("returns 422 status", async () => {
+    describe('when user not found by email', () => {
+      test('returns 422 status', async () => {
         const response = await request(app)
-        .post('/api/v1/users/signin')
-        .set('Accept', 'application/json')
-        .send({ email, password });
+          .post('/api/v1/users/signin')
+          .set('Accept', 'application/json')
+          .send({ email, password })
 
-        expect(response.status).toBe(422);
-        expect(response.body.messages).toEqual(["credentials invalid"])
-      });
-    });
+        expect(response.status).toBe(422)
+        expect(response.body.messages).toEqual(['credentials invalid'])
+      })
+    })
 
-    describe("when non active user found by email", () => {
-      test("returns 422 status", async () => {
-        await createUser(email, password, "new");
+    describe('when non active user found by email', () => {
+      test('returns 422 status', async () => {
+        await createUser(email, password, 'new')
         const response = await request(app)
-        .post('/api/v1/users/signin')
-        .set('Accept', 'application/json')
-        .send({ email, password });
+          .post('/api/v1/users/signin')
+          .set('Accept', 'application/json')
+          .send({ email, password })
 
-        expect(response.status).toBe(422);
-        expect(response.body.messages).toEqual(["credentials invalid"])
-      });
-    });
+        expect(response.status).toBe(422)
+        expect(response.body.messages).toEqual(['credentials invalid'])
+      })
+    })
 
-    describe("when active user found by email but wrong password", () => {
-      test("returns 422 status", async () => {
-        await createUser(email, "0therP@ssw0rd", "active");
+    describe('when active user found by email but wrong password', () => {
+      test('returns 422 status', async () => {
+        await createUser(email, '0therP@ssw0rd', 'active')
         const response = await request(app)
-        .post('/api/v1/users/signin')
-        .set('Accept', 'application/json')
-        .send({ email, password });
+          .post('/api/v1/users/signin')
+          .set('Accept', 'application/json')
+          .send({ email, password })
 
-        expect(response.status).toBe(422);
-        expect(response.body.messages).toEqual(["credentials invalid"])
-      });
-    });
+        expect(response.status).toBe(422)
+        expect(response.body.messages).toEqual(['credentials invalid'])
+      })
+    })
 
-    describe("when active user found by email and correct password", () => {
-      test("returns 200 status", async () => {
-        await createUser(email, password, "active");
+    describe('when active user found by email and correct password', () => {
+      test('returns 200 status', async () => {
+        await createUser(email, password, 'active')
         const response = await request(app)
-        .post('/api/v1/users/signin')
-        .set('Accept', 'application/json')
-        .send({ email, password });
+          .post('/api/v1/users/signin')
+          .set('Accept', 'application/json')
+          .send({ email, password })
 
-        expect(response.status).toBe(200);
-        expect(response.body.authToken).toEqual("test.test.test");
-      });
-    });
-  });
-});
+        expect(response.status).toBe(200)
+        expect(response.body.authToken).toEqual('test.test.test')
+      })
+    })
+  })
+})

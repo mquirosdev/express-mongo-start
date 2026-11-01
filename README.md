@@ -38,13 +38,13 @@ Keep related behavior in the appropriate feature area and extend the same struct
 
 ## API routes
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `POST` | `/api/v1/users` | Create a user |
-| `POST` | `/api/v1/users/verification` | Generate and send a verification code |
-| `PUT` | `/api/v1/users/verification/confirm` | Confirm a verification code |
-| `POST` | `/api/v1/users/signin` | Sign in and receive a JWT |
-| `GET` | `/api/v1` | Example protected route; send `Authorization: Bearer <token>` using the JWT returned by sign-in |
+| Method | Path                                 | Purpose                                                                                         |
+| ------ | ------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `POST` | `/api/v1/users`                      | Create a user                                                                                   |
+| `POST` | `/api/v1/users/verification`         | Generate and send a verification code                                                           |
+| `PUT`  | `/api/v1/users/verification/confirm` | Confirm a verification code                                                                     |
+| `POST` | `/api/v1/users/signin`               | Sign in and receive a JWT                                                                       |
+| `GET`  | `/api/v1`                            | Example protected route; send `Authorization: Bearer <token>` using the JWT returned by sign-in |
 
 ## Development setup
 

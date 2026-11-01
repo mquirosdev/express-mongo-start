@@ -1,152 +1,165 @@
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import { ZodError } from "zod";
-import mongoose, { Error } from "mongoose";
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
+import { ZodError } from 'zod'
+import mongoose, { Error } from 'mongoose'
 
-import User from "../../../src/models/User.js";
-import UserVerification from "../../../src/models/UserVerification.js";
-import handleGenerateVerification from "../../../src/controllers/v1/users/handleGenerateVerification.js";
-import sendVerification from "../../../src/mailers/user/sendVerification.js";
+import User from '../../../src/models/User.js'
+import UserVerification from '../../../src/models/UserVerification.js'
+import handleGenerateVerification from '../../../src/controllers/v1/users/handleGenerateVerification.js'
+import sendVerification from '../../../src/mailers/user/sendVerification.js'
 
-let mongoServer;
+let mongoServer
 
 beforeEach(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  await mongoose.connect(mongoServer.getUri());
-});
+  mongoServer = await MongoMemoryServer.create()
+  await mongoose.connect(mongoServer.getUri())
+})
 
 afterEach(async () => {
-  await mongoose.disconnect();
-  await mongoServer.stop();
-});
+  await mongoose.disconnect()
+  await mongoServer.stop()
+})
 
-vi.mock("../../../src/mailers/user/sendVerification.js", () => ({
+vi.mock('../../../src/mailers/user/sendVerification.js', () => ({
   default: vi.fn()
-}));
+}))
 
-describe("When request body is null", () => {
-  test("raises ZodError with issues", async () => {
+describe('When request body is null', () => {
+  test('raises ZodError with issues', async () => {
     const req = { body: null }
-    let err;
-    try { await handleGenerateVerification(req, {}) } 
-    catch(e) { err = e}
-    expect(err instanceof ZodError).toBeTruthy();
-    expect(err.issues).toHaveLength(1);
-    expect(err.issues[0]['expected']).toEqual('object');
-  });
-});
+    let err
+    try {
+      await handleGenerateVerification(req, {})
+    } catch (e) {
+      err = e
+    }
+    expect(err instanceof ZodError).toBeTruthy()
+    expect(err.issues).toHaveLength(1)
+    expect(err.issues[0]['expected']).toEqual('object')
+  })
+})
 
-["", "  ", "invalid@example"].forEach(email => {
+;['', '  ', 'invalid@example'].forEach((email) => {
   describe(`When email = "${email}"`, () => {
-    test("raises ZodError with issues", async () => {
+    test('raises ZodError with issues', async () => {
       const req = { body: { email } }
-      let err;
-      try { await handleGenerateVerification(req, {}) } 
-      catch(e) { err = e }
-      expect(err instanceof ZodError).toBeTruthy();
-      const invalidParams = err.issues.map(issue => issue.path.join('.'));
-      expect(invalidParams).toContain('email');
-    });
-  });
-});
+      let err
+      try {
+        await handleGenerateVerification(req, {})
+      } catch (e) {
+        err = e
+      }
+      expect(err instanceof ZodError).toBeTruthy()
+      const invalidParams = err.issues.map((issue) => issue.path.join('.'))
+      expect(invalidParams).toContain('email')
+    })
+  })
+})
 
-describe("when request body valid", () => {
-  let res;
-  const email = "valid@example.com";
-  const req = { body: { email: email } };
-    
+describe('when request body valid', () => {
+  let res
+  const email = 'valid@example.com'
+  const req = { body: { email: email } }
+
   beforeEach(() => {
-    res = { status: vi.fn().mockReturnThis(), send: vi.fn().mockReturnThis() };
-  });
+    res = { status: vi.fn().mockReturnThis(), send: vi.fn().mockReturnThis() }
+  })
 
-  describe("User does not exist for email", () => {
-    test("Throws DocumentNotFoundError", async () => {
-      const user = new User({ email, status: "active", password: "P@ssw0rd123" });
-      await user.save();
-      let err;
-      try { await handleGenerateVerification(req, res) } 
-      catch(e) { err = e}
-      expect(err instanceof Error.DocumentNotFoundError).toBeTruthy();
-    });
-  });
+  describe('User does not exist for email', () => {
+    test('Throws DocumentNotFoundError', async () => {
+      const user = new User({
+        email,
+        status: 'active',
+        password: 'P@ssw0rd123'
+      })
+      await user.save()
+      let err
+      try {
+        await handleGenerateVerification(req, res)
+      } catch (e) {
+        err = e
+      }
+      expect(err instanceof Error.DocumentNotFoundError).toBeTruthy()
+    })
+  })
 
-  describe("User exist and first verification", () => {
-    let user;
-    let verification;
+  describe('User exist and first verification', () => {
+    let user
+    let verification
 
     const getVerification = async () => {
-      user = new User({ email, password: "P@ssw0rd123" });
-      await user.save();
-      await handleGenerateVerification(req, res);
-      verification = await UserVerification.findOne({ 
+      user = new User({ email, password: 'P@ssw0rd123' })
+      await user.save()
+      await handleGenerateVerification(req, res)
+      verification = await UserVerification.findOne({
         email,
-        expiresAt: { "$gt": new Date() }
-      }).orFail();
-    };
+        expiresAt: { $gt: new Date() }
+      }).orFail()
+    }
 
-    test("Set status to 204", async () => {
-      await getVerification();
+    test('Set status to 204', async () => {
+      await getVerification()
 
-      expect(res.status).toHaveBeenCalledExactlyOnceWith(204);
-      expect(res.send).toHaveBeenCalledExactlyOnceWith();
-    });
+      expect(res.status).toHaveBeenCalledExactlyOnceWith(204)
+      expect(res.send).toHaveBeenCalledExactlyOnceWith()
+    })
 
-    test("Creates verification", async () => {
-      await getVerification();
-      expect(verification.code).toHaveLength(6);
-      expect(verification.uuid.length()).toBe(16);
-    });
+    test('Creates verification', async () => {
+      await getVerification()
+      expect(verification.code).toHaveLength(6)
+      expect(verification.uuid.length()).toBe(16)
+    })
 
-    test("Mails verification", async () => {
-      await getVerification();
+    test('Mails verification', async () => {
+      await getVerification()
       expect(sendVerification).toHaveBeenCalledExactlyOnceWith({
         email: verification.email,
         code: verification.code,
         uuid: verification.uuid
-      });
-    });
-  });
+      })
+    })
+  })
 
-  describe("User exist and second verification", () => {
-    let user;
-    let verification;
+  describe('User exist and second verification', () => {
+    let user
+    let verification
 
     const getVerification = async () => {
-      user = new User({ email, password: "P@ssw0rd123" });
-      await user.save();
+      user = new User({ email, password: 'P@ssw0rd123' })
+      await user.save()
 
       verification = new UserVerification({ email })
-      verification.generateCode();
-      await verification.save();
+      verification.generateCode()
+      await verification.save()
 
-      await handleGenerateVerification(req, res);
+      await handleGenerateVerification(req, res)
 
-      verification = await UserVerification.findOne({ 
+      verification = await UserVerification.findOne({
         email,
-        expiresAt: { "$gt": new Date() }
-      }).orFail();
-    };
+        expiresAt: { $gt: new Date() }
+      }).orFail()
+    }
 
-    test("Set status to 204", async () => {
-      await getVerification();
+    test('Set status to 204', async () => {
+      await getVerification()
 
-      expect(res.status).toHaveBeenCalledExactlyOnceWith(204);
-      expect(res.send).toHaveBeenCalledExactlyOnceWith();
-    });
+      expect(res.status).toHaveBeenCalledExactlyOnceWith(204)
+      expect(res.send).toHaveBeenCalledExactlyOnceWith()
+    })
 
-    test("Creates verification", async () => {
-      await getVerification();
-      expect(verification.code).toHaveLength(6);
-      expect(verification.uuid.length()).toBe(16);
-    });
+    test('Creates verification', async () => {
+      await getVerification()
+      expect(verification.code).toHaveLength(6)
+      expect(verification.uuid.length()).toBe(16)
+    })
 
-    test("Mails verification", async () => {
-      await getVerification();
+    test('Mails verification', async () => {
+      await getVerification()
       expect(sendVerification).toHaveBeenCalledExactlyOnceWith({
         email: verification.email,
         code: verification.code,
         uuid: verification.uuid
-      });
-    });
-  });
-});
+      })
+    })
+  })
+})

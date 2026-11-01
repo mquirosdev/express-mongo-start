@@ -3,4 +3,4 @@ export default (user) => ({
   name: user.name,
   email: user.email,
   status: user.status
-});
+})

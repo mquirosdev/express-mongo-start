@@ -1,5 +1,5 @@
-import multer from "multer";
+import multer from 'multer'
 
-const bodyParserMiddleware = multer();
+const bodyParserMiddleware = multer()
 
-export default bodyParserMiddleware;
+export default bodyParserMiddleware
