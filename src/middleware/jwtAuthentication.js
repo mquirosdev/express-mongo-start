@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 import { verifyToken } from '../services/jwtSession.js'
 import User from '../models/User.js'
 
-export default async (req, res, next) => {
+export default async (req, _res, next) => {
   const authorization = req.headers.authorization || 'Bearer '
   if (authorization.split(' ')[0] !== 'Bearer') {
     throw new jwt.JsonWebTokenError('Invalid token')

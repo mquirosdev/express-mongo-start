@@ -7,6 +7,20 @@ export default defineConfig([
     files: ['**/*.{js,mjs,cjs}'],
     plugins: { js },
     extends: ['js/recommended'],
-    languageOptions: { globals: globals.node }
+    languageOptions: { globals: globals.node },
+    rules: {
+      "no-unused-vars": [
+        "error",
+        {
+          "args": "all",
+          "argsIgnorePattern": "^_",
+          "caughtErrors": "all",
+          "caughtErrorsIgnorePattern": "^_",
+          "destructuredArrayIgnorePattern": "^_",
+          "varsIgnorePattern": "^_",
+          "ignoreRestSiblings": true
+        }
+      ]
+    }
   }
 ])
