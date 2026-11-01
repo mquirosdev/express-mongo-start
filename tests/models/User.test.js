@@ -1,9 +1,22 @@
-import { describe, test, expect } from "vitest";
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import mongoose from "mongoose";
 
 import User from "../../src/models/User.js";
 import digestPasswordString from "../../src/services/digestPasswordString.js";
 
+
+let mongoServer;
+
+beforeEach(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  await mongoose.connect(mongoServer.getUri());
+});
+
+afterEach(async () => {
+  await mongoose.disconnect();
+  await mongoServer.stop();
+});
 
 describe("Empty instantiation", () => {
   test("does not throw an error", async () => {

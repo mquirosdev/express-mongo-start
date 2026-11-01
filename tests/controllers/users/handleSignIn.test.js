@@ -1,8 +1,22 @@
-import { describe, test, expect, vi, beforeEach, beforeAll } from "vitest";
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { ZodError } from "zod";
+import mongoose from 'mongoose';
 
 import User from "../../../src/models/User";
 import handleSignIn from "../../../src/controllers/v1/users/handleSignIn";
+
+let mongoServer;
+
+beforeEach(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  await mongoose.connect(mongoServer.getUri());
+});
+
+afterEach(async () => {
+  await mongoose.disconnect();
+  await mongoServer.stop();
+});
 
 vi.mock("../../../src/services/jwtSession", () => ({
   createToken: vi.fn().mockReturnValue("test.test.test")

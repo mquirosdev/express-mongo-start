@@ -1,16 +1,24 @@
-import { describe, test, expect, vi } from 'vitest';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import { addMinutes } from 'date-fns';
 import request from 'supertest';
+import mongoose from 'mongoose';
 
 import app from "../../../src/app.js";
 import UserVerification from '../../../src/models/UserVerification.js';
 import User from '../../../src/models/User.js';
 
-vi.mock('../../../src/models/useTransaction.js', () => ({
-  default: vi.fn(() => (async function(fn) {
-    await fn();
-  }))
-}));
+let mongoServer;
+
+beforeEach(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  await mongoose.connect(mongoServer.getUri());
+});
+
+afterEach(async () => {
+  await mongoose.disconnect();
+  await mongoServer.stop();
+});
 
 describe("PUT /api/v1/users/verification/confirm", () => {
   const email = "valid@example.com";

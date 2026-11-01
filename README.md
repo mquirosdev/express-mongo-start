@@ -19,7 +19,7 @@ The project is intentionally small so it can be adapted: add your own domain mod
 
 ```text
 src/
-  controllers/     Request handlers grouped by feature
+  controllers/     Versioned request handlers grouped by feature
   mailers/         Email composition and transport selection
   middleware/      Request parsing and authentication
   models/          Mongoose schemas and persistence helpers
@@ -44,11 +44,11 @@ Keep related behavior in the appropriate feature area and extend the same struct
 | `POST` | `/api/v1/users/verification` | Generate and send a verification code |
 | `PUT` | `/api/v1/users/verification/confirm` | Confirm a verification code |
 | `POST` | `/api/v1/users/signin` | Sign in and receive a JWT |
-| `GET` | `/api/v1` | Example protected route; requires the JWT returned by `/api/v1/users/signin` |
+| `GET` | `/api/v1` | Example protected route; send `Authorization: Bearer <token>` using the JWT returned by sign-in |
 
 ## Development setup
 
-Requirements: Node.js 20.6 or newer and a MongoDB deployment that supports transactions (for example, a replica set).
+Requirements: Node.js 20.6 or newer and a MongoDB deployment that supports transactions (for example, a replica set). The verification confirmation flow uses a MongoDB transaction.
 
 Install dependencies:
 
@@ -93,7 +93,7 @@ Generate coverage:
 npm run test:coverage
 ```
 
-Tests connect to the MongoDB database configured in `vitest.config.js`; that database must support transactions.
+Tests use `mongodb-memory-server` to start a temporary MongoDB instance, so a separate test database does not need to be configured. The first run may need to download the MongoDB binary used by the in-memory server.
 
 ## Extending this starter
 

@@ -1,9 +1,23 @@
-import { describe, test, expect } from 'vitest';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { describe, test, expect, beforeEach, afterEach } from 'vitest';
 import request from 'supertest';
+import mongoose from "mongoose";
 
 import app from "../../../src/app.js";
 import User from '../../../src/models/User.js';
 import presentUser from '../../../src/presenters/presentUser.js';
+
+let mongoServer;
+
+beforeEach(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  await mongoose.connect(mongoServer.getUri());
+});
+
+afterEach(async () => {
+  await mongoose.disconnect();
+  await mongoServer.stop();
+});
 
 class InvalidRequestBody {
   constructor(email, password) {

@@ -7,14 +7,15 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "test:coverage": "vitest run --no-file-parallelism --coverage",
-    "test": "vitest run --no-file-parallelism",
+    "test:coverage": "vitest run --coverage",
+    "test": "vitest run",
     "dev": "node --watch --env-file=.env src/index.js"
   },
   "dependencies": {
     "date-fns": "^4.4.0",
     "express": "^5.3.0",
     "jsonwebtoken": "^9.0.3",
+    "mongodb-memory-server": "^11.3.0",
     "mongoose": "^9.11.2",
     "multer": "^2.4.0",
     "nodemailer": "^10.2.1",

@@ -1,8 +1,21 @@
-import { describe, test, expect } from "vitest";
-import mongoose from "mongoose";
 import { randomUUID } from "node:crypto";
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { describe, test, expect, beforeEach, afterEach } from "vitest";
+import mongoose from "mongoose";
 
 import UserVerification from "../../src/models/UserVerification.js";
+
+let mongoServer;
+
+beforeEach(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  await mongoose.connect(mongoServer.getUri());
+});
+
+afterEach(async () => {
+  await mongoose.disconnect();
+  await mongoServer.stop();
+});
 
 describe("Empty instantiation", () => {
   test("does not throw an error", () => {

@@ -1,9 +1,23 @@
-import { describe, test, expect, vi, beforeAll, beforeEach } from "vitest";
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { ZodError } from "zod";
+import mongoose from 'mongoose';
 
 import handleCreate from "../../../src/controllers/v1/users/handleCreate.js";
 import presentUser from "../../../src/presenters/presentUser.js";
 import User from "../../../src/models/User.js";
+
+let mongoServer;
+
+beforeEach(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  await mongoose.connect(mongoServer.getUri());
+});
+
+afterEach(async () => {
+  await mongoose.disconnect();
+  await mongoServer.stop();
+});
 
 vi.mock("../../../src/services/digestPasswordString.js", () => ({
   default: vi.fn(() => ["digest", "salt"])

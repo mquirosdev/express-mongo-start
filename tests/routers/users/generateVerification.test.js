@@ -1,9 +1,23 @@
-import { describe, test, expect, beforeAll } from 'vitest';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { describe, test, expect, beforeEach, afterEach } from 'vitest';
 import request from 'supertest';
+import mongoose from "mongoose";
 
 import app from "../../../src/app.js";
 import User from '../../../src/models/User.js';
 import UserVerification from '../../../src/models/UserVerification.js';
+
+let mongoServer;
+
+beforeEach(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  await mongoose.connect(mongoServer.getUri());
+});
+
+afterEach(async () => {
+  await mongoose.disconnect();
+  await mongoServer.stop();
+});
 
 describe("POST /api/v1/users/verification", () => {
   describe("without parameters", () => {

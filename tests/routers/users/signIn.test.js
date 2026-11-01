@@ -1,8 +1,22 @@
-import { describe, test, expect, vi } from 'vitest';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import request from 'supertest';
+import mongoose from "mongoose";
 
 import app from "../../../src/app.js";
 import User from '../../../src/models/User.js';
+
+let mongoServer;
+
+beforeEach(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  await mongoose.connect(mongoServer.getUri());
+});
+
+afterEach(async () => {
+  await mongoose.disconnect();
+  await mongoServer.stop();
+});
 
 vi.mock("../../../src/services/jwtSession", () => ({
   createToken: vi.fn().mockReturnValue("test.test.test")

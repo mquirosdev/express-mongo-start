@@ -1,11 +1,24 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
-import { uuid, ZodError } from "zod";
-import { Error } from "mongoose";
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import { ZodError } from "zod";
+import mongoose, { Error } from "mongoose";
 
 import User from "../../../src/models/User.js";
 import UserVerification from "../../../src/models/UserVerification.js";
 import handleGenerateVerification from "../../../src/controllers/v1/users/handleGenerateVerification.js";
 import sendVerification from "../../../src/mailers/user/sendVerification.js";
+
+let mongoServer;
+
+beforeEach(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  await mongoose.connect(mongoServer.getUri());
+});
+
+afterEach(async () => {
+  await mongoose.disconnect();
+  await mongoServer.stop();
+});
 
 vi.mock("../../../src/mailers/user/sendVerification.js", () => ({
   default: vi.fn()

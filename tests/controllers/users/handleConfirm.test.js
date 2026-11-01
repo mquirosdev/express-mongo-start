@@ -1,16 +1,23 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
-import { Error as MongooseError } from "mongoose";
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import mongoose, { Error as MongooseError } from "mongoose";
 import { ZodError } from "zod";
 
 import User from "../../../src/models/User.js";
 import UserVerification from "../../../src/models/UserVerification.js";
 import handleConfirm from "../../../src/controllers/v1/users/handleConfirm.js";
 
-vi.mock("../../../src/models/useTransaction.js", () => ({
-  default: vi.fn(() => (async function(fn) {
-    await fn();
-  }))
-}));
+let mongoServer;
+
+beforeEach(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  await mongoose.connect(mongoServer.getUri());
+});
+
+afterEach(async () => {
+  await mongoose.disconnect();
+  await mongoServer.stop();
+});
 
 describe("handleConfirm", () => {
   let res;
