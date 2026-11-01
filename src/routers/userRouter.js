@@ -1,10 +1,10 @@
 import express from "express";
 
 import parseMultipartBody from '../middleware/parseMultipartBody.js';
-import handleCreate from '../controllers/users/handleCreate.js';
-import handleConfirm from "../controllers/users/handleConfirm.js";
-import handleGenerateVerification from '../controllers/users/handleGenerateVerification.js';
-import handleSignIn from '../controllers/users/handleSignIn.js'
+import handleCreate from '../controllers/v1/users/handleCreate.js';
+import handleConfirm from "../controllers/v1/users/handleConfirm.js";
+import handleGenerateVerification from '../controllers/v1/users/handleGenerateVerification.js';
+import handleSignIn from '../controllers/v1/users/handleSignIn.js'
 
 const userRouter = express.Router();
 

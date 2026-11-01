@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import User from '../../models/User.js';
-import presentUser from "../../presenters/presentUser.js";
+import User from '../../../models/User.js';
+import presentUser from "../../../presenters/presentUser.js";
 
 const ParamsSchema = z.object({
   name: z.object({

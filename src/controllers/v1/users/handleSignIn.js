@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import User from "../../models/User.js";
-import digestPasswordString from "../../services/digestPasswordString.js";
-import { createToken } from "../../services/jwtSession.js";
+import User from "../../../models/User.js";
+import digestPasswordString from "../../../services/digestPasswordString.js";
+import { createToken } from "../../../services/jwtSession.js";
 
 const ParamsSchema = z.object({
   email: z.email("invalid"),

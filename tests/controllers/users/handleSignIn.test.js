@@ -2,7 +2,7 @@ import { describe, test, expect, vi, beforeEach, beforeAll } from "vitest";
 import { ZodError } from "zod";
 
 import User from "../../../src/models/User";
-import handleSignIn from "../../../src/controllers/users/handleSignIn";
+import handleSignIn from "../../../src/controllers/v1/users/handleSignIn";
 
 vi.mock("../../../src/services/jwtSession", () => ({
   createToken: vi.fn().mockReturnValue("test.test.test")

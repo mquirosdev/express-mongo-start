@@ -5,11 +5,11 @@ import app from "../../../src/app.js";
 import User from '../../../src/models/User.js';
 import UserVerification from '../../../src/models/UserVerification.js';
 
-describe("POST /users/verification", () => {
+describe("POST /api/v1/users/verification", () => {
   describe("without parameters", () => {
     test("reponse status 422", async () => {
       const response = await request(app)
-        .post('/users/verification')
+        .post('/api/v1/users/verification')
         .set('Accept', 'application/json')
 
       expect(response.status).toBe(422);
@@ -21,7 +21,7 @@ describe("POST /users/verification", () => {
     describe(`with email = "${email}"`, () => {
       test("reponse status 422", async () => {
         const response = await request(app)
-          .post('/users/verification')
+          .post('/api/v1/users/verification')
           .set('Accept', 'application/json')
           .send({ email })
 
@@ -40,7 +40,7 @@ describe("POST /users/verification", () => {
         await user.save();
 
         const response = await request(app)
-          .post('/users/verification')
+          .post('/api/v1/users/verification')
           .set('Accept', 'application/json')
           .send({ email  })
 
@@ -58,7 +58,7 @@ describe("POST /users/verification", () => {
         await user.save();
 
         response = await request(app)
-          .post('/users/verification')
+          .post('/api/v1/users/verification')
           .set('Accept', 'application/json')
           .send({ email  })
       }

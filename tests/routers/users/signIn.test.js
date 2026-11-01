@@ -8,7 +8,7 @@ vi.mock("../../../src/services/jwtSession", () => ({
   createToken: vi.fn().mockReturnValue("test.test.test")
 }));
 
-describe("POST /users/signin", () => {
+describe("POST /api/v1/users/signin", () => {
   const invalidRequestMessages = [
     [" params required"],
     ["email invalid", "password required"],
@@ -25,7 +25,7 @@ describe("POST /users/signin", () => {
     describe(`When invalid params ${idx}`, async () => {
       test("returns 422 status", async () => {
         const response = await request(app)
-        .post('/users/signin')
+        .post('/api/v1/users/signin')
         .set('Accept', 'application/json')
         .send(body)
 
@@ -49,7 +49,7 @@ describe("POST /users/signin", () => {
     describe("when user not found by email", () => {
       test("returns 422 status", async () => {
         const response = await request(app)
-        .post('/users/signin')
+        .post('/api/v1/users/signin')
         .set('Accept', 'application/json')
         .send({ email, password });
 
@@ -62,7 +62,7 @@ describe("POST /users/signin", () => {
       test("returns 422 status", async () => {
         await createUser(email, password, "new");
         const response = await request(app)
-        .post('/users/signin')
+        .post('/api/v1/users/signin')
         .set('Accept', 'application/json')
         .send({ email, password });
 
@@ -75,7 +75,7 @@ describe("POST /users/signin", () => {
       test("returns 422 status", async () => {
         await createUser(email, "0therP@ssw0rd", "active");
         const response = await request(app)
-        .post('/users/signin')
+        .post('/api/v1/users/signin')
         .set('Accept', 'application/json')
         .send({ email, password });
 
@@ -88,7 +88,7 @@ describe("POST /users/signin", () => {
       test("returns 200 status", async () => {
         await createUser(email, password, "active");
         const response = await request(app)
-        .post('/users/signin')
+        .post('/api/v1/users/signin')
         .set('Accept', 'application/json')
         .send({ email, password });
 

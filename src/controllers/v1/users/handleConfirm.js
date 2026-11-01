@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { addMinutes } from "date-fns";
 
-import useTransaction from "../../models/useTransaction.js";
-import UserVerification from "../../models/UserVerification.js";
-import User from "../../models/User.js";
+import useTransaction from "../../../models/useTransaction.js";
+import UserVerification from "../../../models/UserVerification.js";
+import User from "../../../models/User.js";
 
 
 const ParamsSchema = z.object({

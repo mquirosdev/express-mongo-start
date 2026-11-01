@@ -40,11 +40,11 @@ Keep related behavior in the appropriate feature area and extend the same struct
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| `POST` | `/users` | Create a user |
-| `POST` | `/users/verification` | Generate and send a verification code |
-| `PUT` | `/users/verification/confirm` | Confirm a verification code |
-| `POST` | `/users/signin` | Sign in and receive a JWT |
-| `GET` | `/app` | Example protected route; requires the JWT returned by `/users/signin` |
+| `POST` | `/api/v1/users` | Create a user |
+| `POST` | `/api/v1/users/verification` | Generate and send a verification code |
+| `PUT` | `/api/v1/users/verification/confirm` | Confirm a verification code |
+| `POST` | `/api/v1/users/signin` | Sign in and receive a JWT |
+| `GET` | `/api/v1` | Example protected route; requires the JWT returned by `/api/v1/users/signin` |
 
 ## Development setup
 

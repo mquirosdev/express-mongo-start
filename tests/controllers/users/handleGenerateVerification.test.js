@@ -4,7 +4,7 @@ import { Error } from "mongoose";
 
 import User from "../../../src/models/User.js";
 import UserVerification from "../../../src/models/UserVerification.js";
-import handleGenerateVerification from "../../../src/controllers/users/handleGenerateVerification.js";
+import handleGenerateVerification from "../../../src/controllers/v1/users/handleGenerateVerification.js";
 import sendVerification from "../../../src/mailers/user/sendVerification.js";
 
 vi.mock("../../../src/mailers/user/sendVerification.js", () => ({

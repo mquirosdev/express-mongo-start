@@ -16,7 +16,7 @@ class InvalidRequestBody {
   }
 }
 
-describe("POST /users", () => {
+describe("POST /api/v1/users", () => {
   const invalidRequestBodies = [
     null,
     {},
@@ -39,7 +39,7 @@ describe("POST /users", () => {
     describe(`invalid params - ${invalidRequestBodies[idx]}`, () => {
       test("response status 422", async () => {
         const response = await request(app)
-          .post('/users')
+          .post('/api/v1/users')
           .set('Accept', 'application/json')
           .send(body)
         
@@ -60,7 +60,7 @@ describe("POST /users", () => {
       await user.save();
 
       const response = await request(app)
-        .post('/users')
+        .post('/api/v1/users')
         .set('Accept', 'application/json')
         .send({ email, password })
       
@@ -75,7 +75,7 @@ describe("POST /users", () => {
       const password = "P@ssw0rd123";
 
       const response = await request(app)
-        .post('/users')
+        .post('/api/v1/users')
         .set('Accept', 'application/json')
         .send({ email, password, name: { first: "first", last: "last" } })
 

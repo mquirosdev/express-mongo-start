@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, beforeAll, beforeEach } from "vitest";
 import { ZodError } from "zod";
 
-import handleCreate from "../../../src/controllers/users/handleCreate.js";
+import handleCreate from "../../../src/controllers/v1/users/handleCreate.js";
 import presentUser from "../../../src/presenters/presentUser.js";
 import User from "../../../src/models/User.js";
 

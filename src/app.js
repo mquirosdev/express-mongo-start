@@ -11,8 +11,8 @@ const app = express();
 
 app.use(express.json());
   
-app.use('/users', userRouter);
-app.use('/app', appRouter);
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1', appRouter);
 
 // This catches errors when validating if attached files are valid
 app.use((err, _req, res, next) => {

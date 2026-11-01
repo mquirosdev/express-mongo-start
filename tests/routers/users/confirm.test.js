@@ -12,7 +12,7 @@ vi.mock('../../../src/models/useTransaction.js', () => ({
   }))
 }));
 
-describe("PUT /verification/confirm", () => {
+describe("PUT /api/v1/users/verification/confirm", () => {
   const email = "valid@example.com";
 
   const invalidRequestsResponses = [
@@ -31,7 +31,7 @@ describe("PUT /verification/confirm", () => {
     describe(`when invalid params ${idx}`, () => {
       test("returns status 422", async () => {
         const response = await request(app)
-          .put('/users/verification/confirm')
+          .put('/api/v1/users/verification/confirm')
           .set('Accept', 'application/json')
           .send(body);
         
@@ -52,7 +52,7 @@ describe("PUT /verification/confirm", () => {
       await verification.save();
 
       const response = await request(app)
-        .put('/users/verification/confirm')
+        .put('/api/v1/users/verification/confirm')
         .set('Accept', 'application/json')
         .send({ code: verification.code, uuid: verification.uuid });
       
@@ -67,7 +67,7 @@ describe("PUT /verification/confirm", () => {
       await verification.save();
 
       const response = await request(app)
-        .put('/users/verification/confirm')
+        .put('/api/v1/users/verification/confirm')
         .set('Accept', 'application/json')
         .send({ code: verification.code, uuid: verification.uuid });
       
@@ -85,7 +85,7 @@ describe("PUT /verification/confirm", () => {
       await verification.save();
 
       const response = await request(app)
-        .put('/users/verification/confirm')
+        .put('/api/v1/users/verification/confirm')
         .set('Accept', 'application/json')
         .send({ code: verification.code, uuid: verification.uuid });
       

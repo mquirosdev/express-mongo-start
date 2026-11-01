@@ -4,7 +4,7 @@ import { ZodError } from "zod";
 
 import User from "../../../src/models/User.js";
 import UserVerification from "../../../src/models/UserVerification.js";
-import handleConfirm from "../../../src/controllers/users/handleConfirm.js";
+import handleConfirm from "../../../src/controllers/v1/users/handleConfirm.js";
 
 vi.mock("../../../src/models/useTransaction.js", () => ({
   default: vi.fn(() => (async function(fn) {
