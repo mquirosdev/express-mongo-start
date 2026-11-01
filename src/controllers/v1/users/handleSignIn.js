@@ -18,7 +18,7 @@ export default async (req, res) => {
     return;
   }
 
-  const [digest, _] = digestPasswordString(password, user.salt);
+  const digest = digestPasswordString(password, user.salt)[0];
   if(digest != user.passwordDigest) {
     res.status(422).json({ messages: ["credentials invalid"] });
     return;

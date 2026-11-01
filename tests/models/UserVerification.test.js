@@ -40,7 +40,6 @@ describe("Saving while empty", () => {
 describe("Generating a verification code", () => {
   test("sets a six-digit code, expiration, and UUID", () => {
     const verification = new UserVerification();
-    const beforeGeneration = Date.now();
 
     verification.generateCode();
 

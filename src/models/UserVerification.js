@@ -2,7 +2,6 @@ import crypto from "node:crypto";
 import { addMinutes } from "date-fns";
 import { Schema, model } from "mongoose";
 
-const VerificationCodeLength = 6;
 const VerificationCodeMinutesTTL = 5;
 const UserVerificationSchema = Schema(
   {

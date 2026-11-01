@@ -23,7 +23,7 @@ app.use((err, _req, res, next) => {
   }
 });
 
-app.use((err, _req, res, next) => {
+app.use((err, _req, res) => {
   if(err instanceof ZodError) {
     res.status(422).json({
       messages: err.issues.map(i => `${i.path.join('.')} ${i.message}`)
